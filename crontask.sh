@@ -1,10 +1,12 @@
-#!/usr/bin/env python
-import redis
+mport redis
 import httplib,urllib
+import datetime
+import sys
 
-rdshost="10.209.32.38"
-rdsport="10520"
-rdsdomain="w10520.wdds.redis.com"
+#parameter input is port: sys.argv[1]
+rdshost="w"+sys.argv[1]+".wdds.redis.com"
+rdsport=sys.argv[1]
+rdsdomain=rdshost
 httphost="localhost"
 httpport=8086
 
@@ -12,10 +14,9 @@ httpport=8086
 rds=redis.Redis(host=rdshost,port=rdsport,db=0)
 rds_config=rds.config_get('*')
 params='i'+rdsport+',host='+rdshost+',role=m,domain='+rdsdomain+' '
-for key in rds_config: 
-  print "%s: %s" % (key, rds_config[key])
+for key in rds_config:
+  #print "%s: %s" % (key, rds_config[key])
   params=params+key+"=\""+rds_config[key]+"\","
-#print "%s" % params
 
 ##output
 try:
@@ -23,10 +24,14 @@ try:
   httpcli=httplib.HTTPConnection(httphost,httpport, timeout=30)
   httpcli.request("POST", "/write?db=redis_config_monitor", params[:-1], headers)
   response=httpcli.getresponse()
-  print response.status
-  print response.reason
+  #print response.status
+  #print response.reason
 except Exception, e:
     print e
 finally:
     if httpcli:
         httpcli.close()
+
+now = datetime.datetime.now()
+styled_time = now.strftime("%Y-%m-%d %H:%M:%S")
+print styled_time+" completed"
