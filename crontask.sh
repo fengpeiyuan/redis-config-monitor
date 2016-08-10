@@ -1,4 +1,5 @@
-mport redis
+#!/usr/bin/env python
+import redis
 import httplib,urllib
 import datetime
 import sys
